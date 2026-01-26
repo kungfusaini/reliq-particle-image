@@ -438,7 +438,6 @@ See [examples/README.md](examples/README.md) for a guided walkthrough.
 - [Secondary Particles](examples/secondary-particles.html) - Depth layer configuration
 - [Animation Demo](examples/animation-demo.html) - Frame-based animation playback
 - [Responsive Demo](examples/responsive-demo.html) - Density + size scaling
-- [Migration Guide](examples/migration-guide.html) - Side-by-side API comparison
 
 ### Local Development
 ```bash

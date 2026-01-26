@@ -109,5 +109,3 @@ export class Utils {
     return false
   }
 }
-
-export default Utils

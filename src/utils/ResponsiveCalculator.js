@@ -1,5 +1,4 @@
 import { Utils } from './Utils.js'
-import { Utils } from './Utils.js'
 
 /**
  * Responsive calculations for particle sizing and density
