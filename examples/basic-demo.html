@@ -82,6 +82,14 @@
     <script type="module">
       import ReliqParticleImage from '../src/index.js'
 
+      const logoSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+          <rect width="240" height="240" rx="48" fill="#1f1a16" />
+          <path d="M70 180V60h62c30 0 52 16 52 44 0 19-10 34-27 40l34 36h-28l-30-32h-35v32H70zm28-56h30c16 0 26-7 26-20 0-13-10-20-26-20H98v40z" fill="#f7f2ea" />
+        </svg>
+      `
+      const logoSrc = `data:image/svg+xml;utf8,${encodeURIComponent(logoSvg)}`
+
       const config = {
         features: {
           interactivity: false,
@@ -101,8 +109,8 @@
         },
         image: {
           src: {
-            path: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=cover&w=640&q=80',
-            is_external: true,
+            path: logoSrc,
+            is_external: false,
           },
           size: {
             canvas_pct: 58,
