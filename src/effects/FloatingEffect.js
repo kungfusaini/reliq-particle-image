@@ -3,7 +3,7 @@
  */
 export class FloatingEffect {
   constructor(config) {
-    this.config = config?.floating || {}
+    this.config = FloatingEffect.extractConfig(config)
     this.enabled = this.config.enabled || false
     this.amplitude = this.config.amplitude || 8
     this.frequency = this.config.frequency || 0.25
@@ -33,11 +33,20 @@ export class FloatingEffect {
    * @param {Object} newConfig - New floating configuration
    */
   updateConfig(newConfig) {
-    this.config = { ...this.config, ...newConfig }
+    const floatingConfig = newConfig?.particles?.movement?.floating || newConfig?.floating || {}
+    this.config = { ...this.config, ...floatingConfig }
     this.enabled = this.config.enabled || false
     this.amplitude = this.config.amplitude || 8
     this.frequency = this.config.frequency || 0.25
     this.phaseOffset = this.config.phase_offset || 0
+  }
+
+  static extractConfig(config) {
+    if (!config) {
+      return {}
+    }
+
+    return config.particles?.movement?.floating || config.floating || {}
   }
 }
 

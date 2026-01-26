@@ -485,7 +485,7 @@ export class ReliqParticleImage {
    * Check if animation is currently playing
    */
   isAnimationPlaying() {
-    return this.animationSystem ? this.animationSystem.isPlaying === true : false
+    return this.animationSystem ? this.animationSystem.isPlaying() : false
   }
 
   /**

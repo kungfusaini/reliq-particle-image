@@ -36,17 +36,16 @@ An enhancement to the brilliant [particle-image](https://github.com/paxtonfitzpa
 npm install reliq-enhanced-particle-image
 ```
 
-### CDN
-```html
-<script src="https://unpkg.com/reliq-enhanced-particle-image@latest/dist/particle-image-enhanced.min.js"></script>
-```
-
-### Local Build
+### Browser Build (after local build)
 ```bash
-git clone git@github.com:reliqstudios/reliq-enhanced-particle-image.git
+git clone git@github.com:kungfusaini/reliq-particle-image.git
 cd reliq-enhanced-particle-image
 npm install
 npm run build
+```
+
+```html
+<script src="./dist/particle-image-enhanced.js"></script>
 ```
 
 ## 🎯 Quick Start
@@ -55,8 +54,9 @@ npm run build
 ```html
 <div id="particle-container"></div>
 
-<script src="reliq-enhanced-particle-image.js"></script>
-<script>
+<script type="module">
+  import ReliqParticleImage from './src/index.js'
+
   const particleSystem = new ReliqParticleImage('#particle-container', {
     image: {
       src: { path: '/path/to/image.png' }
@@ -443,7 +443,7 @@ See [examples/README.md](examples/README.md) for a guided walkthrough.
 ### Local Development
 ```bash
 # Clone repository
-git clone git@github.com:reliqstudios/reliq-enhanced-particle-image.git
+git clone git@github.com:kungfusaini/reliq-particle-image.git
 cd reliq-enhanced-particle-image
 
 # Install dependencies

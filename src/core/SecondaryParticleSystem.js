@@ -1,5 +1,7 @@
 import { Utils, ResponsiveCalculator } from '../utils/index.js'
 
+import { ConfigMerger } from '../utils/ConfigMerger.js'
+
 /**
  * Secondary particle system for background/foreground effects
  */
@@ -22,34 +24,11 @@ export class SecondaryParticleSystem {
    */
   initializeSystem() {
     // Merge secondary config with primary config
-    this.mergedConfig = this.mergeConfigs()
+    this.mergedConfig = ConfigMerger.mergeSecondaryConfig(
+      this.config.particles,
+      this.config.secondary_particles
+    )
     this.createSecondaryParticles()
-  }
-
-  /**
-   * Merge primary and secondary configurations
-   */
-  mergeConfigs() {
-    const primary = this.config.particles
-    const secondary = this.config.secondary_particles
-    
-    // Deep clone primary config as base
-    const merged = JSON.parse(JSON.stringify(primary))
-    
-    // Apply secondary overrides
-    for (let [key, value] of Object.entries(secondary)) {
-      if (key === 'enabled') continue
-      
-      if (value !== undefined && value !== null) {
-        if (typeof value === 'object' && !Array.isArray(value)) {
-          merged[key] = Utils.deepExtend(merged[key] || {}, value)
-        } else {
-          merged[key] = value
-        }
-      }
-    }
-    
-    return merged
   }
 
   /**

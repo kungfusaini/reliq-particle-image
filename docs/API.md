@@ -210,15 +210,15 @@ All major features are opt-in through the `features` object:
     interactivity: {
       on_hover: {
         enabled: boolean,
-        action: 'repulse'|'big_repulse'|'grab'
+        action: 'repulse'|'big_repulse'
       },
       on_click: {
         enabled: boolean,
-        action: 'repulse'|'big_repulse'|'grab'
+        action: 'repulse'|'big_repulse'
       },
       on_touch: {
         enabled: boolean,
-        action: 'repulse'|'big_repulse'|'grab'
+        action: 'repulse'|'big_repulse'
       }
     }
   }
@@ -304,10 +304,6 @@ All major features are opt-in through the `features` object:
     big_repulse: {
       distance: number,            // Detection distance (50-300)
       strength: number            // Repulse strength (100-2000)
-    },
-    grab: {
-      distance: number,            // Detection distance (50-300)
-      line_width: number          // Line width (1-10)
     }
   }
 }

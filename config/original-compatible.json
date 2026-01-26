@@ -35,10 +35,6 @@
     "big_repulse": {
       "distance": 100,
       "strength": 500
-    },
-    "grab": {
-      "distance": 100,
-      "line_width": 1
     }
   }
 }

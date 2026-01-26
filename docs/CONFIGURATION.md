@@ -286,12 +286,6 @@ Elliptical distribution around image area
     big_repulse: {
       distance: 100,                    // Detection distance (50-500)
       strength: 500                     // Push strength (100-2000)
-    },
-    
-    // Grab interaction (connect with lines)
-    grab: {
-      distance: 100,                    // Detection distance (50-500)
-      line_width: 1                     // Line width (1-10)
     }
   }
 }

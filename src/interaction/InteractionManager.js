@@ -1,5 +1,8 @@
 import { Utils } from '../utils/Utils.js'
 
+import { MouseHandler } from './MouseHandler.js'
+import { TouchHandler } from './TouchHandler.js'
+
 /**
  * Unified interaction manager for particles
  */
@@ -21,11 +24,11 @@ export class InteractionManager {
     const needsTouch = this.shouldEnableTouch()
 
     if (needsMouse) {
-      this.mouseHandler = new (require('./MouseHandler.js').default)(this.canvas, this.config)
+      this.mouseHandler = new MouseHandler(this.canvas, this.config)
     }
 
     if (needsTouch) {
-      this.touchHandler = new (require('./TouchHandler.js').default)(this.canvas, this.config)
+      this.touchHandler = new TouchHandler(this.canvas, this.config)
     }
   }
 
@@ -120,10 +123,10 @@ export class InteractionManager {
    */
   applyRepulsion(particle, args) {
     const state = this.getInteractionState()
-    let mouseX = state.mouseX
-    let mouseY = state.mouseY
-    let touchX = state.touchX
-    let mouseY = state.touchY
+    const mouseX = state.mouseX
+    const mouseY = state.mouseY
+    const touchX = state.touchX
+    const touchY = state.touchY
 
     // Use touch position if available, otherwise mouse position
     const x = touchX !== null ? touchX : mouseX

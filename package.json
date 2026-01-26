@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:reliqstudios/reliq-enhanced-particle-image.git"
+    "url": "git@github.com:kungfusaini/reliq-particle-image.git"
   },
   "devDependencies": {
     "@babel/core": "^7.22.0",
