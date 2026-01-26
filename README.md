@@ -5,7 +5,7 @@
 
 **Advanced particle image system with sprite animations, dual particle layers, responsive scaling, and modern ES6+ architecture.**
 
-A significant enhancement to the original [particle-image](https://github.com/paxtonfitzpatrick/particle-image) library with over 4x the functionality and a modern, modular architecture. This repository is not a fork; it is a standalone reimplementation with explicit credit to the original project.
+An enhancement to the brilliant [particle-image](https://github.com/paxtonfitzpatrick/particle-image). Credit goes to Paxton Fitzpatrick for the amazing original library.
 
 ## 🚀 Key Enhancements
 
