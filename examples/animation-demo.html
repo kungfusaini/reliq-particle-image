@@ -63,8 +63,8 @@
       <section class="copy">
         <h1>Animated Frames</h1>
         <p>
-          The animation system cycles through a set of frames, preserving
-          particle motion and interactivity for each image.
+          The animation system cycles through the Reliq chest sprite frames,
+          preserving particle motion and interactivity for each image.
         </p>
         <p>Click the canvas to replay the sequence.</p>
       </section>
@@ -74,28 +74,7 @@
     <script type="module">
       import ReliqParticleImage from '../src/index.js'
 
-      const spriteFrames = [
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <rect width="200" height="200" rx="32" fill="#1d0f3c" />
-          <circle cx="100" cy="100" r="56" fill="#f7c65a" />
-        </svg>`,
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <rect width="200" height="200" rx="32" fill="#0f1b3c" />
-          <path d="M100 28l20 40 44 6-32 30 8 44-40-20-40 20 8-44-32-30 44-6z" fill="#f77ab8" />
-        </svg>`,
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <rect width="200" height="200" rx="32" fill="#16223a" />
-          <path d="M110 18L60 112h34l-12 70 60-100h-34z" fill="#65f0b4" />
-        </svg>`,
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <rect width="200" height="200" rx="32" fill="#281643" />
-          <path d="M100 30l70 120H30z" fill="#8aa7ff" />
-        </svg>`,
-      ]
-
-      const frames = spriteFrames.map(frame =>
-        `data:image/svg+xml;utf8,${encodeURIComponent(frame)}`
-      )
+      const frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
       const config = {
         features: {
@@ -128,14 +107,17 @@
         animation: {
           enabled: true,
           frames,
+          frame_base_path: 'https://reliqstudios.com/chest',
+          frame_suffix: '.png',
           frame_duration_ms: 240,
           loop: true,
           auto_start: true,
+          is_external: true,
         },
         image: {
           src: {
-            path: frames[0],
-            is_external: false,
+            path: 'https://reliqstudios.com/chest/0.png',
+            is_external: true,
           },
           size: {
             canvas_pct: 52,
