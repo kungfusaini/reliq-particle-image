@@ -433,7 +433,6 @@ See [examples/README.md](examples/README.md) for a guided walkthrough.
 ## 🧪 Testing & Examples
 
 ### Live Examples
-- [Basic Demo](examples/basic-demo.html) - Static logo with minimal motion
 - [Interactive Repulse](examples/advanced-demo.html) - Hover and click interaction showcase
 - [Secondary Particles](examples/secondary-particles.html) - Depth layer configuration
 - [Animation Demo](examples/animation-demo.html) - Frame-based animation playback
