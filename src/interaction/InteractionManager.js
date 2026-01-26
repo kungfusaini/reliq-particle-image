@@ -117,12 +117,106 @@ export class InteractionManager {
   }
 
   /**
+   * Resolve interaction action based on current input state
+   * @param {Object} state - Interaction state
+   * @returns {string|null} Action name
+   */
+  getPrimaryAction(state) {
+    const interactivity = this.config.particles?.interactivity || {}
+
+    if (state.isMouseClicked && interactivity.on_click?.enabled) {
+      return interactivity.on_click.action || 'big_repulse'
+    }
+
+    if (state.isTouchActive && interactivity.on_touch?.enabled) {
+      return interactivity.on_touch.action || 'repulse'
+    }
+
+    if (state.isMouseOver && interactivity.on_hover?.enabled) {
+      return interactivity.on_hover.action || 'repulse'
+    }
+
+    return null
+  }
+
+  /**
+   * Resolve repulse arguments for the selected action
+   * @param {string} action - Action name
+   * @returns {Object|null} Repulse argument payload
+   */
+  getRepulseArgs(action) {
+    if (!action) {
+      return null
+    }
+
+    const interactions = this.config.interactions || {}
+    const args = interactions[action]
+
+    if (!args) {
+      return null
+    }
+
+    if (action === 'big_repulse') {
+      const distance = args.distance || 120
+      const strength = args.strength || 300
+      return {
+        detection_radius: distance,
+        max_displacement: Math.min(Math.max(strength / 200, 0.5), 5.0),
+        repulse_duration: 0.12,
+        force_curve: 'linear',
+      }
+    }
+
+    return args
+  }
+
+  /**
+   * Apply primary particle interactions
+   * @param {Object} particle - Particle to affect
+   * @param {Object} state - Cached interaction state
+   */
+  applyPrimaryInteraction(particle, state) {
+    if (!this.config.particles?.interactivity) {
+      return
+    }
+
+    if (!state) {
+      return
+    }
+
+    const action = this.getPrimaryAction(state)
+    const args = this.getRepulseArgs(action)
+    if (!args) {
+      return
+    }
+
+    this.applyRepulsion(particle, args, state)
+  }
+
+  /**
+   * Apply secondary particle interactions
+   * @param {Object} particle - Secondary particle to affect
+   * @param {Object} state - Cached interaction state
+   */
+  applySecondaryInteraction(particle, state) {
+    const secondary = this.config.secondary_particles?.interactivity
+    if (!secondary?.enabled) {
+      return
+    }
+
+    if (!state) {
+      return
+    }
+
+    this.applyGentleInteraction(particle, secondary, state)
+  }
+
+  /**
    * Apply repulsion interaction to particle
    * @param {Object} particle - Particle to affect
    * @param {Object} args - Interaction arguments
    */
-  applyRepulsion(particle, args) {
-    const state = this.getInteractionState()
+  applyRepulsion(particle, args, state = this.getInteractionState()) {
     const mouseX = state.mouseX
     const mouseY = state.mouseY
     const touchX = state.touchX
@@ -140,14 +234,23 @@ export class InteractionManager {
     const dy_mouse = particle.y - y
     const mouse_dist = Math.sqrt(dx_mouse * dx_mouse + dy_mouse * dy_mouse)
 
-    if (mouse_dist <= args.detection_radius) {
+    if (mouse_dist === 0) {
+      return
+    }
+
+    const detectionRadius = args.detection_radius || 100
+    const maxDisplacement = args.max_displacement || 0.5
+    const repulseDuration = args.repulse_duration || 0.1
+    const forceCurve = args.force_curve || 'linear'
+
+    if (mouse_dist <= detectionRadius) {
       // Calculate displacement from destination
-      const dx_dest = particle.x - particle.dest_x
-      const dy_dest = particle.y - particle.dest_y
+      const dx_dest = particle.x - particle.destX
+      const dy_dest = particle.y - particle.destY
       const current_displacement = Math.sqrt(dx_dest * dx_dest + dy_dest * dy_dest)
 
       // Check displacement constraint
-      if (current_displacement < args.max_displacement) {
+      if (current_displacement < maxDisplacement) {
         // Initialize repulse timer if not started
         if (!particle.repulse_start_time) {
           particle.repulse_start_time = Date.now()
@@ -155,13 +258,13 @@ export class InteractionManager {
 
         // Calculate elapsed time as fraction of repulse duration
         const elapsed_ms = Date.now() - particle.repulse_start_time
-        const elapsed_fraction = Math.min(elapsed_ms / (args.repulse_duration * 1000), 1)
+        const elapsed_fraction = Math.min(elapsed_ms / (repulseDuration * 1000), 1)
 
         // Apply force with decay after significant displacement
         if (elapsed_fraction < 0.8) {
           // Calculate force multiplier based on curve
           let force_multiplier
-          switch (args.force_curve) {
+          switch (forceCurve) {
             case 'top_heavy':
               force_multiplier = 1 - (1 - elapsed_fraction) ** 2
               break
@@ -175,17 +278,17 @@ export class InteractionManager {
           }
 
           // Calculate required acceleration from physics
-          const required_acceleration = (2 * args.max_displacement) / (args.repulse_duration ** 2)
+          const required_acceleration = (2 * maxDisplacement) / (repulseDuration ** 2)
 
           // Apply displacement constraint factor
-          const constraint_factor = Math.max(0, 1 - (current_displacement / args.max_displacement))
+          const constraint_factor = Math.max(0, 1 - (current_displacement / maxDisplacement))
 
           // Calculate and apply force
           const force = required_acceleration * force_multiplier * constraint_factor
-          particle.acc_x = ((particle.x - x) / mouse_dist) * force * 0.01
-          particle.acc_y = ((particle.y - y) / mouse_dist) * force * 0.01
-          particle.vx += particle.acc_x
-          particle.vy += particle.acc_y
+          particle.accX = ((particle.x - x) / mouse_dist) * force * 0.01
+          particle.accY = ((particle.y - y) / mouse_dist) * force * 0.01
+          particle.vx += particle.accX
+          particle.vy += particle.accY
         }
       }
     } else {
@@ -199,10 +302,9 @@ export class InteractionManager {
    * @param {Object} particle - Secondary particle to affect
    * @param {Object} args - Interaction arguments
    */
-  applyGentleInteraction(particle, args) {
-    const state = this.getInteractionState()
-    let x = state.touchX !== null ? state.touchX : state.mouseX
-    let y = state.touchY !== null ? state.touchY : state.mouseY
+  applyGentleInteraction(particle, args, state = this.getInteractionState()) {
+    const x = state.touchX !== null ? state.touchX : state.mouseX
+    const y = state.touchY !== null ? state.touchY : state.mouseY
 
     if (x === null || y === null) {
       return
@@ -212,12 +314,18 @@ export class InteractionManager {
     const dy_mouse = particle.y - y
     const mouse_dist = Math.sqrt(dx_mouse * dx_mouse + dy_mouse * dy_mouse)
 
-    if (mouse_dist <= args.detection_radius) {
+    if (mouse_dist === 0) {
+      return
+    }
+
+    const detectionRadius = args.detection_radius || 120
+
+    if (mouse_dist <= detectionRadius) {
       const sensitivity = args.touch_sensitivity || 0.1
       const maxOffset = args.touch_max_offset || 2.0
 
       // Calculate gentle repulsion force
-      const distance_factor = 1 - (mouse_dist / args.detection_radius)
+      const distance_factor = 1 - (mouse_dist / detectionRadius)
       const repulse_force = distance_factor * sensitivity * maxOffset
 
       // Apply gentle force as direct velocity addition
@@ -232,9 +340,28 @@ export class InteractionManager {
    */
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig }
-    
+
     if (this.touchHandler) {
       this.touchHandler.updateConfig(this.config)
+    }
+
+    if (this.mouseHandler) {
+      this.mouseHandler.updateConfig?.(this.config)
+    }
+
+    const shouldReinit =
+      (!this.mouseHandler && this.shouldEnableMouse()) ||
+      (!this.touchHandler && this.shouldEnableTouch())
+
+    if (shouldReinit) {
+      const wasAttached = this.isAttached
+      this.detach()
+      this.mouseHandler = null
+      this.touchHandler = null
+      this.initialize()
+      if (wasAttached) {
+        this.attach()
+      }
     }
   }
 }

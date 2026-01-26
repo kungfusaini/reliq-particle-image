@@ -53,6 +53,7 @@ export class ReliqParticleImage {
     // Core utilities
     this.responsiveCalculator = new ResponsiveCalculator(this.config)
     this.interactionManager = new InteractionManager(this.canvas, this.config)
+    this.interactionManager.initialize()
 
     // Effects
     this.floatingEffect = this.features.floating ? new FloatingEffect(this.config) : null
@@ -85,6 +86,7 @@ export class ReliqParticleImage {
     this.canvas.style.touchAction = 'none'
     
     this.container.appendChild(this.canvas)
+    this.context = this.canvas.getContext('2d', { willReadFrequently: true })
     this.updateCanvasSize()
   }
 
@@ -94,6 +96,9 @@ export class ReliqParticleImage {
   updateCanvasSize() {
     this.canvas.width = this.canvas.offsetWidth
     this.canvas.height = this.canvas.offsetHeight
+    if (this.context) {
+      this.context.imageSmoothingEnabled = true
+    }
   }
 
   /**
@@ -203,7 +208,7 @@ export class ReliqParticleImage {
       return null
     }
 
-    const ctx = this.canvas.getContext('2d')
+    const ctx = this.context
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     
     // Calculate image bounds
@@ -211,6 +216,7 @@ export class ReliqParticleImage {
     ctx.drawImage(this.image, bounds.x, bounds.y, bounds.width, bounds.height)
     
     const pixelData = ctx.getImageData(bounds.x, bounds.y, bounds.width, bounds.height)
+    pixelData.bounds = bounds
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     
     return pixelData
@@ -260,8 +266,7 @@ export class ReliqParticleImage {
       }
 
       // Clear canvas
-      const ctx = this.canvas.getContext('2d')
-      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
       // Update systems
       this.updateSystems()
@@ -279,12 +284,18 @@ export class ReliqParticleImage {
    * Update all systems
    */
   updateSystems() {
+    const interactionState =
+      this.features.interactivity && this.interactionManager
+        ? this.interactionManager.getInteractionState()
+        : null
+    const interactionManager = interactionState ? this.interactionManager : null
+
     // Update primary particles
-    this.primarySystem.updateParticles()
+    this.primarySystem.updateParticles(interactionManager, interactionState)
 
     // Update secondary particles
     if (this.secondarySystem) {
-      this.secondarySystem.updateParticles()
+      this.secondarySystem.updateParticles(interactionManager, interactionState)
     }
 
     // Update animation system
@@ -305,7 +316,6 @@ export class ReliqParticleImage {
    * Render all systems
    */
   renderSystems() {
-    const ctx = this.canvas.getContext('2d')
     const opacity = this.fadeEffect ? this.fadeEffect.getCurrentOpacity() : 1.0
 
     // Determine render order
@@ -348,7 +358,7 @@ export class ReliqParticleImage {
     if (this.scatterEffect) {
       const primaryParticles = this.primarySystem.getParticles()
       const secondaryParticles = this.secondarySystem?.getParticles() || []
-      this.scatterEffect.scatterParticles([...primaryParticles, ...secondaryParticles], true)
+      this.scatterEffect.scatterParticles([...primaryParticles, ...secondaryParticles])
     }
 
     if (this.fadeEffect) {

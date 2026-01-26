@@ -14,6 +14,11 @@ export class MouseHandler {
       click_y: null
     }
     this.isAttached = false
+
+    this.onMouseMove = this.handleMouseMove.bind(this)
+    this.onMouseLeave = this.handleMouseLeave.bind(this)
+    this.onMouseDown = this.handleMouseDown.bind(this)
+    this.onMouseUp = this.handleMouseUp.bind(this)
   }
 
   /**
@@ -22,10 +27,10 @@ export class MouseHandler {
   attach() {
     if (this.isAttached) return
 
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this))
-    this.canvas.addEventListener('mouseleave', this.handleMouseLeave.bind(this))
-    this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this))
-    this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this))
+    this.canvas.addEventListener('mousemove', this.onMouseMove)
+    this.canvas.addEventListener('mouseleave', this.onMouseLeave)
+    this.canvas.addEventListener('mousedown', this.onMouseDown)
+    this.canvas.addEventListener('mouseup', this.onMouseUp)
     
     this.isAttached = true
   }
@@ -36,10 +41,10 @@ export class MouseHandler {
   detach() {
     if (!this.isAttached) return
 
-    this.canvas.removeEventListener('mousemove', this.handleMouseMove)
-    this.canvas.removeEventListener('mouseleave', this.handleMouseLeave)
-    this.canvas.removeEventListener('mousedown', this.handleMouseDown)
-    this.canvas.removeEventListener('mouseup', this.handleMouseUp)
+    this.canvas.removeEventListener('mousemove', this.onMouseMove)
+    this.canvas.removeEventListener('mouseleave', this.onMouseLeave)
+    this.canvas.removeEventListener('mousedown', this.onMouseDown)
+    this.canvas.removeEventListener('mouseup', this.onMouseUp)
     
     this.isAttached = false
   }
@@ -48,10 +53,9 @@ export class MouseHandler {
    * Handle mouse move event
    */
   handleMouseMove(e) {
-    const pos_x = e.offsetX || e.clientX
-    const pos_y = e.offsetY || e.clientY
-    this.mouse.x = pos_x
-    this.mouse.y = pos_y
+    const rect = this.canvas.getBoundingClientRect()
+    this.mouse.x = e.clientX - rect.left
+    this.mouse.y = e.clientY - rect.top
   }
 
   /**
@@ -100,6 +104,10 @@ export class MouseHandler {
    */
   isMouseClicked() {
     return this.mouse.click_x !== null && this.mouse.click_y !== null
+  }
+
+  updateConfig(newConfig) {
+    this.config = { ...this.config, ...newConfig }
   }
 }
 

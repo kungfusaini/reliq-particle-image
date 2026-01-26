@@ -248,6 +248,7 @@ All major features are opt-in through the `features` object:
     // Interactivity
     interactivity: {
       enabled: boolean,
+      detection_radius: number,     // Interaction radius (50-300)
       touch_sensitivity: number,    // Touch sensitivity (0.01-1.0)
       touch_max_offset: number      // Maximum touch offset (0.5-10.0)
     }
@@ -264,16 +265,6 @@ All major features are opt-in through the `features` object:
       path: string,               // Image path or URL
       is_external: boolean         // Set for cross-origin images
     },
-    
-    // Animation system
-    animation: {
-      enabled: boolean,
-      frames: number[],           // Frame numbers sequence
-      frame_duration_ms: number,   // Frame duration (50-1000)
-      loop: boolean,             // Loop animation
-      auto_start: boolean        // Start on load
-    },
-    
     // Positioning
     position: {
       x_img_pct: number,          // X position offset (-100 to 100)
@@ -286,6 +277,22 @@ All major features are opt-in through the `features` object:
       min_px: number,            // Minimum size in pixels
       max_px: number             // Maximum size in pixels
     }
+  }
+}
+```
+
+### Animation Configuration
+
+```javascript
+{
+  animation: {
+    enabled: boolean,
+    frames: Array<string|number>, // URLs or frame numbers
+    frame_base_path: string,      // Used when frames are numbers
+    frame_suffix: string,         // Defaults to '.png'
+    frame_duration_ms: number,    // Frame duration (50-1000)
+    loop: boolean,                // Loop animation
+    auto_start: boolean           // Start on load
   }
 }
 ```

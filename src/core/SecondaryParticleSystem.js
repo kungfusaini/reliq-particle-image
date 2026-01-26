@@ -67,7 +67,13 @@ export class SecondaryParticleSystem {
       for (let j = 0; j < rows; j++) {
         const x = (i + 0.5) * spacing
         const y = (j + 0.5) * spacing
-        this.particles.push(new SecondaryParticle(x, y, this.mergedConfig, this.responsiveCalculator))
+        this.particles.push(new SecondaryParticle(
+          x,
+          y,
+          this.canvas,
+          this.mergedConfig,
+          this.responsiveCalculator
+        ))
       }
     }
   }
@@ -106,7 +112,13 @@ export class SecondaryParticleSystem {
       } while (attempts < 50 && Utils.hasOverlap(x, y, this.particles, minSpacing))
       
       if (attempts < 50) {
-        this.particles.push(new SecondaryParticle(x, y, this.mergedConfig, this.responsiveCalculator))
+        this.particles.push(new SecondaryParticle(
+          x,
+          y,
+          this.canvas,
+          this.mergedConfig,
+          this.responsiveCalculator
+        ))
       }
     }
   }
@@ -144,7 +156,13 @@ export class SecondaryParticleSystem {
       } while (attempts < 50 && Utils.hasOverlap(x, y, this.particles, minSpacing))
       
       if (attempts < 50) {
-        this.particles.push(new SecondaryParticle(x, y, this.mergedConfig, this.responsiveCalculator))
+        this.particles.push(new SecondaryParticle(
+          x,
+          y,
+          this.canvas,
+          this.mergedConfig,
+          this.responsiveCalculator
+        ))
       }
     }
   }
@@ -152,11 +170,15 @@ export class SecondaryParticleSystem {
   /**
    * Update all secondary particles
    */
-  updateParticles() {
+  updateParticles(interactionManager = null, interactionState = null) {
     if (!this.particles.length) return
 
     for (const particle of this.particles) {
       particle.update()
+
+      if (interactionManager) {
+        interactionManager.applySecondaryInteraction(particle, interactionState)
+      }
     }
   }
 
@@ -200,9 +222,10 @@ export class SecondaryParticleSystem {
  * Individual secondary particle class
  */
 class SecondaryParticle {
-  constructor(x, y, config, responsiveCalculator) {
+  constructor(x, y, canvas, config, responsiveCalculator) {
     this.x = x
     this.y = y
+    this.canvas = canvas
     this.destX = x  // Secondary particles don't move to a destination
     this.destY = y
     this.config = config
@@ -219,6 +242,7 @@ class SecondaryParticle {
     this.color = config.color || '#ffffff'
     this.radius = this.calculateRadius()
     this.targetRadius = this.radius
+    this.isSecondary = true
 
     // Movement properties
     this.restlessness = {
@@ -260,6 +284,12 @@ class SecondaryParticle {
    * Update particle physics and position
    */
   update() {
+    if (this.config.movement?.restless?.enabled && !this.restlessness.onCurrFrame) {
+      if (Math.random() < 0.02) {
+        this.restlessness.onCurrFrame = true
+      }
+    }
+
     // Handle scatter behavior
     if (this.isScattered) {
       this.updateScatterMovement()

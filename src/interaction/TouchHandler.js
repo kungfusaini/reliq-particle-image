@@ -18,6 +18,10 @@ export class TouchHandler {
     this.dragThreshold = 10
     this.tapMaxDuration = 300
     this.isAttached = false
+
+    this.onTouchStart = this.handleTouchStart.bind(this)
+    this.onTouchMove = this.handleTouchMove.bind(this)
+    this.onTouchEnd = this.handleTouchEnd.bind(this)
   }
 
   /**
@@ -26,9 +30,9 @@ export class TouchHandler {
   attach() {
     if (this.isAttached) return
 
-    this.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true })
-    this.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false })
-    this.canvas.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false })
+    this.canvas.addEventListener('touchstart', this.onTouchStart, { passive: true })
+    this.canvas.addEventListener('touchmove', this.onTouchMove, { passive: false })
+    this.canvas.addEventListener('touchend', this.onTouchEnd, { passive: false })
     
     this.isAttached = true
   }
@@ -39,9 +43,9 @@ export class TouchHandler {
   detach() {
     if (!this.isAttached) return
 
-    this.canvas.removeEventListener('touchstart', this.handleTouchStart)
-    this.canvas.removeEventListener('touchmove', this.handleTouchMove)
-    this.canvas.removeEventListener('touchend', this.handleTouchEnd)
+    this.canvas.removeEventListener('touchstart', this.onTouchStart)
+    this.canvas.removeEventListener('touchmove', this.onTouchMove)
+    this.canvas.removeEventListener('touchend', this.onTouchEnd)
     
     this.isAttached = false
   }
@@ -51,8 +55,13 @@ export class TouchHandler {
    */
   handleTouchStart(e) {
     if (e.touches.length === 1) {
+      const rect = this.canvas.getBoundingClientRect()
+      const x = e.touches[0].clientX - rect.left
+      const y = e.touches[0].clientY - rect.top
       this.touch.startX = e.touches[0].clientX
       this.touch.startY = e.touches[0].clientY
+      this.touch.x = x
+      this.touch.y = y
       this.touch.startTime = Date.now()
       this.touch.isTouchEvent = true
     }

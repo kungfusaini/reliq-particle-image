@@ -57,9 +57,13 @@ export class AnimationSystem {
         
         img.addEventListener('error', () => resolve(frameNum))
         
-        // Load frame (assuming sequential numbering like /chest/0.png, /chest/1.png, etc.)
-        img.src = `/chest/${frameNum}.png`
-        if (this.config.image?.src?.is_external) {
+        const frameSource = this.getFrameSource(frameNum)
+        img.src = frameSource
+        if (
+          this.config.animation?.is_external ||
+          this.config.image?.src?.is_external ||
+          frameSource.startsWith('http')
+        ) {
           img.crossOrigin = "anonymous"
         }
       })
@@ -72,6 +76,38 @@ export class AnimationSystem {
         this.start()
       }
     })
+  }
+
+  /**
+   * Resolve source URL for a frame
+   * @param {string|number} frame - Frame identifier
+   * @returns {string} Frame source URL
+   */
+  getFrameSource(frame) {
+    if (typeof frame === 'string') {
+      return frame
+    }
+
+    const basePath =
+      this.config.animation?.frame_base_path ||
+      this.config.animation?.base_path ||
+      this.config.animation?.framePath
+
+    const suffix = this.config.animation?.frame_suffix || '.png'
+    if (basePath) {
+      return `${basePath.replace(/\/$/, '')}/${frame}${suffix}`
+    }
+
+    const fallbackPath = this.config.image?.src?.path
+    if (fallbackPath) {
+      const lastSlash = fallbackPath.lastIndexOf('/')
+      const directory = lastSlash >= 0 ? fallbackPath.slice(0, lastSlash) : ''
+      if (directory) {
+        return `${directory}/${frame}${suffix}`
+      }
+    }
+
+    return `/frames/${frame}${suffix}`
   }
 
   /**

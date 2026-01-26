@@ -146,17 +146,60 @@ export class ConfigMerger {
       },
       interactions: {
         repulse: {
-          distance: 100,
-          strength: 200
+          detection_radius: 100,
+          max_displacement: 0.5,
+          repulse_duration: 0.1,
+          force_curve: 'linear'
         },
         big_repulse: {
-          distance: 100,
-          strength: 500
+          distance: 120,
+          strength: 300
         }
+      },
+      responsive: {
+        enabled: false
       }
     }
     
-    return Utils.deepExtend(defaults, config)
+    return ConfigMerger.normalizeConfig(Utils.deepExtend(defaults, config))
+  }
+
+  /**
+   * Normalize configuration based on enabled features
+   * @param {Object} config - Configuration with defaults applied
+   * @returns {Object} Normalized configuration
+   */
+  static normalizeConfig(config) {
+    const features = config.features || {}
+
+    if (!config.animation && config.image?.animation) {
+      config.animation = { ...config.image.animation }
+      delete config.image.animation
+    }
+
+    if (features.responsive !== false && config.responsive?.enabled === undefined) {
+      config.responsive = { ...config.responsive, enabled: true }
+    }
+
+    if (features.animation === true && config.animation?.enabled === undefined) {
+      config.animation = { ...config.animation, enabled: true }
+    }
+
+    if (features.floating === true && config.particles?.movement?.floating?.enabled === undefined) {
+      config.particles.movement.floating = {
+        ...config.particles.movement.floating,
+        enabled: true,
+      }
+    }
+
+    if (features.fade === true && config.particles?.fade_out?.enabled === undefined) {
+      config.particles.fade_out = {
+        ...config.particles.fade_out,
+        enabled: true,
+      }
+    }
+
+    return config
   }
 }
 

@@ -66,13 +66,6 @@
       "path": "/chest/test.png",
       "is_external": false
     },
-    "animation": {
-      "enabled": true,
-      "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      "frame_duration_ms": 150,
-      "loop": false,
-      "auto_start": false
-    },
     "position": {
       "x_img_pct": -15,
       "y_img_pct": -15
@@ -82,6 +75,15 @@
       "min_px": 350,
       "max_px": 2000
     }
+  },
+  "animation": {
+    "enabled": true,
+    "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "frame_base_path": "/chest",
+    "frame_suffix": ".png",
+    "frame_duration_ms": 150,
+    "loop": false,
+    "auto_start": false
   },
   "interactions": {
     "repulse": {
@@ -122,6 +124,5 @@
     "scatter": true,
     "fade": true,
     "interactivity": true
-  },
-  "disabled": false
+  }
 }

@@ -24,6 +24,8 @@ export class CoreParticleSystem {
     }
 
     this.particles = []
+    const offsetX = pixelData.bounds?.x || 0
+    const offsetY = pixelData.bounds?.y || 0
     const responsiveDensity = this.responsiveCalculator.calculateResponsiveDensity(
       this.config.particles.density
     )
@@ -35,8 +37,8 @@ export class CoreParticleSystem {
 
         // Check if pixel has sufficient opacity
         if (pixelIndex < pixelData.data.length && pixelData.data[pixelIndex] > 128) {
-          const destX = i
-          const destY = j
+          const destX = i + offsetX
+          const destY = j + offsetY
           let initX, initY
 
           // Determine initial position
@@ -57,9 +59,13 @@ export class CoreParticleSystem {
   /**
    * Update all particles
    */
-  updateParticles() {
+  updateParticles(interactionManager = null, interactionState = null) {
     for (const particle of this.particles) {
       particle.update()
+
+      if (interactionManager) {
+        interactionManager.applyPrimaryInteraction(particle, interactionState)
+      }
     }
   }
 
@@ -120,6 +126,7 @@ class Particle {
     this.color = this.getParticleColor()
     this.radius = this.calculateRadius()
     this.targetRadius = this.radius
+    this.isSecondary = false
 
     // Movement properties
     this.restlessness = {
@@ -156,6 +163,12 @@ class Particle {
    * Update particle physics and position
    */
   update() {
+    if (this.config.particles.movement.restless?.enabled && !this.restlessness.onCurrFrame) {
+      if (Math.random() < 0.02) {
+        this.restlessness.onCurrFrame = true
+      }
+    }
+
     // Apply restless movement if enabled
     if (this.config.particles.movement.restless?.enabled && this.restlessness.onCurrFrame) {
       this.applyRestlessMovement()

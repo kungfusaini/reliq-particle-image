@@ -56,6 +56,5 @@
     "scatter": true,
     "fade": true,
     "interactivity": true
-  },
-  "disabled": false
+  }
 }

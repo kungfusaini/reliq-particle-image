@@ -8,6 +8,8 @@ The Reliq Enhanced Particle Image system uses a comprehensive configuration syst
 
 Feature toggles allow you to enable only the features you need, optimizing both bundle size and runtime performance.
 
+When a feature is enabled, the library will automatically set the corresponding `enabled` flag for that feature if it is missing (for example, `features.animation` will enable `animation.enabled`).
+
 ### All Features Available
 
 ```javascript
@@ -157,15 +159,6 @@ The responsive system automatically adjusts particle size and density based on v
       is_external: false                // Set for cross-origin images
     },
     
-    // Sprite animation
-    animation: {
-      enabled: true,
-      frames: [0, 1, 2, 3, 4],       // Frame sequence
-      frame_duration_ms: 150,            // Duration per frame
-      loop: false,                       // Loop playback
-      auto_start: false                  // Start on load
-    },
-    
     // Positioning
     position: {
       x_img_pct: -15,                  // X offset (-100 to 100%)
@@ -195,9 +188,24 @@ For sprite animations, organize frames sequentially:
 ```
 
 ```javascript
-// Animation configuration
+// Animation configuration (top-level)
 animation: {
+  enabled: true,
   frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  frame_base_path: '/animation',
+  frame_suffix: '.png',
+  frame_duration_ms: 150,
+  loop: false,
+  auto_start: false
+}
+
+// Or provide full URLs
+animation: {
+  enabled: true,
+  frames: [
+    'https://example.com/frames/0.png',
+    'https://example.com/frames/1.png',
+  ],
   frame_duration_ms: 150,
   loop: false,
   auto_start: false
@@ -234,6 +242,7 @@ Secondary particles provide background/foreground effects independent of the mai
     // Interactions (independent from primary)
     interactivity: {
       enabled: true,
+      detection_radius: 120,              // Interaction radius (50-300)
       touch_sensitivity: 0.1,             // Touch response strength (0.01-1.0)
       touch_max_offset: 2.0               // Maximum touch displacement (0.5-10.0)
     }
@@ -353,14 +362,16 @@ Force │╲╱
 ```javascript
 {
   image: {
-    src: { path: '/logo-sprites/' },
-    animation: {
-      enabled: true,
-      frames: [0,1,2,3,4,5,6,7,8,9],
-      frame_duration_ms: 100,
-      loop: false,
-      auto_start: false
-    }
+    src: { path: '/logo-sprites/0.png' }
+  },
+  animation: {
+    enabled: true,
+    frames: [0,1,2,3,4,5,6,7,8,9],
+    frame_base_path: '/logo-sprites',
+    frame_suffix: '.png',
+    frame_duration_ms: 100,
+    loop: false,
+    auto_start: false
   },
   secondary_particles: {
     enabled: true,

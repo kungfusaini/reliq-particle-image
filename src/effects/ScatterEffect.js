@@ -14,16 +14,15 @@ export class ScatterEffect {
   /**
    * Scatter particles away from current positions
    * @param {Array} particles - Array of particles to scatter
-   * @param {boolean} includeSecondary - Whether to scatter secondary particles too
    */
-  scatterParticles(particles, includeSecondary = false) {
+  scatterParticles(particles) {
     // Store original positions if not already scattered
     if (!this.isScattered) {
       this.originalPositions.clear()
       particles.forEach(particle => {
         this.originalPositions.set(particle, {
-          x: particle.dest_x || particle.x,
-          y: particle.dest_y || particle.y
+          x: particle.destX ?? particle.x,
+          y: particle.destY ?? particle.y
         })
       })
     }
@@ -36,8 +35,8 @@ export class ScatterEffect {
       
       // Set new destination far from current position
       const scatterDistance = this.force * (particle.isSecondary ? 25 : 30)
-      particle.dest_x = particle.x + Math.cos(scatterAngle) * scatterDistance
-      particle.dest_y = particle.y + Math.sin(scatterAngle) * scatterDistance
+      particle.destX = particle.x + Math.cos(scatterAngle) * scatterDistance
+      particle.destY = particle.y + Math.sin(scatterAngle) * scatterDistance
       
       // Give particles initial velocity in scatter direction
       const scatterVelocity = particle.isSecondary ? this.force * 0.8 : this.force
@@ -51,10 +50,6 @@ export class ScatterEffect {
       particle.isScattered = true
     })
 
-    if (includeSecondary && particles.p2) {
-      // Handle secondary particles array if provided separately
-      this.scatterParticles(particles.p2, false)
-    }
   }
 
   /**
@@ -76,8 +71,8 @@ export class ScatterEffect {
   returnParticle(particle) {
     const original = this.originalPositions.get(particle)
     if (original) {
-      particle.dest_x = original.x
-      particle.dest_y = original.y
+      particle.destX = original.x
+      particle.destY = original.y
       particle.friction = Math.random() * 0.01 + 0.92 // Reset normal friction
       particle.isScattered = false
     }

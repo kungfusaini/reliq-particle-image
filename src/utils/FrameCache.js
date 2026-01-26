@@ -43,6 +43,12 @@ export class FrameCache {
         bounds.scaledWidth, 
         bounds.scaledHeight
       )
+      pixelData.bounds = {
+        x: bounds.x_pos,
+        y: bounds.y_pos,
+        width: bounds.scaledWidth,
+        height: bounds.scaledHeight,
+      }
       
       this.frames.set(frameNum, pixelData)
       this.loadedCount++
