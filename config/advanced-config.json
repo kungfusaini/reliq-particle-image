@@ -1,0 +1,131 @@
+{
+  "particles": {
+    "color": "#3c3836",
+    "density": 50,
+    "start_scrambled": false,
+    "responsive": {
+      "enabled": true,
+      "size": {
+        "value": 3,
+        "random": false,
+        "min_size": 1,
+        "max_size": 10,
+        "scale_factor": 0.0005,
+        "base_viewport": 600
+      },
+      "density": {
+        "base_density": 50,
+        "min_density": 50,
+        "max_density": 50,
+        "scale_factor": 0.08,
+        "base_viewport": 600
+      },
+      "breakpoints": {
+        "mobile": { "max_width": 768, "multiplier": 0.6 },
+        "tablet": { "max_width": 1024, "multiplier": 1.0 },
+        "desktop": { "multiplier": 1.5 }
+      }
+    },
+    "movement": {
+      "speed": 10,
+      "restless": {
+        "enabled": true,
+        "value": 1000
+      },
+      "floating": {
+        "enabled": true,
+        "amplitude": 8,
+        "frequency": 0.25,
+        "phase_offset": 0
+      }
+    },
+    "scatter": {
+      "force": 10
+    },
+    "fade_out": {
+      "enabled": true,
+      "duration_ms": 1000
+    },
+    "interactivity": {
+      "on_hover": {
+        "enabled": true,
+        "action": "repulse"
+      },
+      "on_click": {
+        "enabled": false,
+        "action": "big_repulse"
+      },
+      "on_touch": {
+        "enabled": true,
+        "action": "repulse"
+      }
+    }
+  },
+  "image": {
+    "src": {
+      "path": "/chest/test.png",
+      "is_external": false
+    },
+    "animation": {
+      "enabled": true,
+      "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "frame_duration_ms": 150,
+      "loop": false,
+      "auto_start": false
+    },
+    "position": {
+      "x_img_pct": -15,
+      "y_img_pct": -15
+    },
+    "size": {
+      "canvas_pct": 50,
+      "min_px": 350,
+      "max_px": 2000
+    }
+  },
+  "interactions": {
+    "repulse": {
+      "detection_radius": 40,
+      "max_displacement": 0.5,
+      "repulse_duration": 0.1,
+      "force_curve": "linear"
+    },
+    "big_repulse": {
+      "distance": 100,
+      "strength": 500
+    },
+    "grab": {
+      "distance": 100,
+      "line_width": 1
+    }
+  },
+  "secondary_particles": {
+    "enabled": true,
+    "placement_mode": "around_image",
+    "particle_multiplier": 0.075,
+    "placement_image_buffer": 80,
+    "color": "#ebdbb2",
+    "render_order": "background",
+    "movement": {
+      "random": {
+        "enabled": true,
+        "speed": 0.3
+      }
+    },
+    "interactivity": {
+      "enabled": true,
+      "touch_sensitivity": 0.1,
+      "touch_max_offset": 2.0
+    }
+  },
+  "features": {
+    "responsive": true,
+    "secondaryParticles": true,
+    "animation": true,
+    "floating": true,
+    "scatter": true,
+    "fade": true,
+    "interactivity": true
+  },
+  "disabled": false
+}

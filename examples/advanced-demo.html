@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reliq Particle Image - Interactive Repulse</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+        background: radial-gradient(circle at top, #111217 0%, #1c1d24 35%, #0d0f12 100%);
+        color: #f3f4f6;
+        min-height: 100vh;
+      }
+
+      header {
+        padding: 32px 10vw 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        letter-spacing: -0.03em;
+      }
+
+      p {
+        margin: 0;
+        max-width: 560px;
+        line-height: 1.5;
+        color: #cdd2dc;
+      }
+
+      #particle-container {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 140px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Interactive Repulse</h1>
+      <p>Hover or click the particle canvas to push the image away with amplified repulse forces.</p>
+    </header>
+    <div id="particle-container"></div>
+
+    <script type="module">
+      import ReliqParticleImage from '../src/index.js'
+
+      const config = {
+        features: {
+          interactivity: true,
+          scatter: true,
+          responsive: true,
+        },
+        particles: {
+          density: 150,
+          color: '#8fb8ff',
+          size: {
+            value: 2.1,
+            random: true,
+          },
+          movement: {
+            speed: 1.1,
+          },
+          interactivity: {
+            on_hover: {
+              enabled: true,
+              action: 'repulse',
+            },
+            on_click: {
+              enabled: true,
+              action: 'big_repulse',
+            },
+            on_touch: {
+              enabled: true,
+              action: 'repulse',
+            },
+          },
+        },
+        interactions: {
+          repulse: {
+            distance: 140,
+            strength: 220,
+          },
+          big_repulse: {
+            distance: 200,
+            strength: 420,
+          },
+        },
+        image: {
+          src: {
+            path: 'https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=cover&w=720&q=80',
+            is_external: true,
+          },
+          size: {
+            canvas_pct: 54,
+            min_px: 200,
+            max_px: 520,
+          },
+          position: {
+            x_img_pct: -12,
+            y_img_pct: -6,
+          },
+        },
+      }
+
+      const particleSystem = new ReliqParticleImage('#particle-container', config)
+      particleSystem.initialize()
+    </script>
+  </body>
+</html>

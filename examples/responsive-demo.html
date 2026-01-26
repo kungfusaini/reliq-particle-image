@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reliq Particle Image - Responsive Density</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Manrope", "Helvetica Neue", Arial, sans-serif;
+        background: radial-gradient(circle at 80% 20%, #fff6e4 0%, #f0e0c4 40%, #c9b48a 100%);
+        color: #3d3120;
+        min-height: 100vh;
+      }
+
+      .layout {
+        padding: 32px 10vw 0;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 2.1rem;
+      }
+
+      p {
+        margin: 0 0 20px;
+        max-width: 640px;
+        line-height: 1.6;
+      }
+
+      #particle-container {
+        position: relative;
+        width: 100%;
+        height: 70vh;
+        border-radius: 24px 24px 0 0;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(60, 45, 20, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <section class="layout">
+      <h1>Responsive Density + Size</h1>
+      <p>
+        Resize the browser to see particle density and size adjust smoothly across
+        breakpoints.
+      </p>
+    </section>
+    <div id="particle-container"></div>
+
+    <script type="module">
+      import ReliqParticleImage from '../src/index.js'
+
+      const config = {
+        features: {
+          responsive: true,
+          interactivity: true,
+        },
+        responsive: {
+          enabled: true,
+          size: {
+            base_viewport: 640,
+            scale_factor: 0.0007,
+            min_size: 0.9,
+            max_size: 4.2,
+          },
+          density: {
+            base_viewport: 640,
+            scale_factor: 0.08,
+            min_density: 70,
+            max_density: 220,
+          },
+          breakpoints: {
+            mobile: { max_width: 640, multiplier: 0.7 },
+            tablet: { max_width: 1024, multiplier: 1.0 },
+            desktop: { multiplier: 1.4 },
+          },
+        },
+        particles: {
+          density: 130,
+          color: '#5a4630',
+          size: {
+            value: 2.2,
+            random: true,
+          },
+          movement: {
+            speed: 0.8,
+          },
+          interactivity: {
+            on_hover: {
+              enabled: true,
+              action: 'repulse',
+            },
+            on_touch: {
+              enabled: true,
+              action: 'repulse',
+            },
+          },
+        },
+        interactions: {
+          repulse: {
+            distance: 110,
+            strength: 160,
+          },
+        },
+        image: {
+          src: {
+            path: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=cover&w=700&q=80',
+            is_external: true,
+          },
+          size: {
+            canvas_pct: 48,
+            min_px: 200,
+            max_px: 520,
+          },
+          position: {
+            x_img_pct: -12,
+            y_img_pct: -8,
+          },
+        },
+      }
+
+      const particleSystem = new ReliqParticleImage('#particle-container', config)
+      particleSystem.initialize()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reliq Particle Image - Animation Frames</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Sora", "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #130f26 0%, #1e1a36 45%, #2f2b48 100%);
+        color: #f0f0ff;
+        min-height: 100vh;
+      }
+
+      .wrap {
+        display: grid;
+        grid-template-columns: minmax(280px, 360px) 1fr;
+        min-height: 100vh;
+      }
+
+      .copy {
+        padding: 40px;
+        background: rgba(19, 15, 38, 0.7);
+        border-right: 1px solid rgba(240, 240, 255, 0.1);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 2rem;
+      }
+
+      p {
+        margin: 0 0 18px;
+        line-height: 1.6;
+        color: #cfcfe9;
+      }
+
+      #particle-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+      }
+
+      @media (max-width: 860px) {
+        .wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .copy {
+          border-right: none;
+          border-bottom: 1px solid rgba(240, 240, 255, 0.1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="copy">
+        <h1>Animated Frames</h1>
+        <p>
+          The animation system cycles through a set of frames, preserving
+          particle motion and interactivity for each image.
+        </p>
+        <p>Click the canvas to replay the sequence.</p>
+      </section>
+      <div id="particle-container"></div>
+    </div>
+
+    <script type="module">
+      import ReliqParticleImage from '../src/index.js'
+
+      const frames = [
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=cover&w=640&q=80',
+        'https://images.unsplash.com/photo-1471879832106-c7ab9e0cee23?auto=format&fit=cover&w=640&q=80',
+        'https://images.unsplash.com/photo-1487014679447-9f8336841d58?auto=format&fit=cover&w=640&q=80',
+      ]
+
+      const config = {
+        features: {
+          animation: true,
+          scatter: true,
+          interactivity: true,
+          responsive: true,
+        },
+        particles: {
+          density: 130,
+          color: '#cdb7ff',
+          size: {
+            value: 2.2,
+            random: true,
+          },
+          movement: {
+            speed: 0.9,
+          },
+          interactivity: {
+            on_hover: {
+              enabled: true,
+              action: 'repulse',
+            },
+            on_click: {
+              enabled: true,
+              action: 'big_repulse',
+            },
+          },
+        },
+        animation: {
+          enabled: true,
+          frames,
+          frame_duration_ms: 220,
+          loop: true,
+          auto_start: true,
+        },
+        image: {
+          src: {
+            path: frames[0],
+            is_external: true,
+          },
+          size: {
+            canvas_pct: 52,
+            min_px: 220,
+            max_px: 520,
+          },
+          position: {
+            x_img_pct: -10,
+            y_img_pct: -6,
+          },
+        },
+      }
+
+      const particleSystem = new ReliqParticleImage('#particle-container', config)
+      particleSystem.initialize()
+
+      const container = document.querySelector('#particle-container')
+      container?.addEventListener('click', () => particleSystem.startAnimation())
+    </script>
+  </body>
+</html>

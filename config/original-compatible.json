@@ -1,0 +1,44 @@
+{
+  "particles": {
+    "color": "#3c3836",
+    "density": 100,
+    "start_scrambled": false,
+    "movement": {
+      "speed": 1
+    }
+  },
+  "image": {
+    "src": {
+      "path": "https://raw.githubusercontent.com/paxtonfitzpatrick/particle-image/master/codepen-logo-demo.png",
+      "is_external": true
+    },
+    "size": {
+      "canvas_pct": 60,
+      "min_px": 150,
+      "max_px": 800
+    }
+  },
+  "features": {
+    "responsive": false,
+    "secondaryParticles": false,
+    "animation": false,
+    "floating": false,
+    "scatter": false,
+    "fade": false,
+    "interactivity": true
+  },
+  "interactions": {
+    "repulse": {
+      "distance": 100,
+      "strength": 200
+    },
+    "big_repulse": {
+      "distance": 100,
+      "strength": 500
+    },
+    "grab": {
+      "distance": 100,
+      "line_width": 1
+    }
+  }
+}

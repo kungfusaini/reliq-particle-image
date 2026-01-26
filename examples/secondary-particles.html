@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reliq Particle Image - Secondary Layer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+        background: radial-gradient(circle at 20% 20%, #f3f8ff 0%, #d7e3f6 45%, #b6c7e6 100%);
+        color: #1b2433;
+        min-height: 100vh;
+      }
+
+      .intro {
+        padding: 32px 10vw 0;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 2.2rem;
+      }
+
+      p {
+        margin: 0 0 24px;
+        max-width: 560px;
+        line-height: 1.6;
+      }
+
+      #particle-container {
+        position: relative;
+        width: 100%;
+        height: 70vh;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="intro">
+      <h1>Secondary Particle Layer</h1>
+      <p>
+        This demo adds a secondary layer of floating particles behind the primary
+        image to create depth without overwhelming the logo.
+      </p>
+    </section>
+    <div id="particle-container"></div>
+
+    <script type="module">
+      import ReliqParticleImage from '../src/index.js'
+
+      const config = {
+        features: {
+          secondaryParticles: true,
+          interactivity: true,
+          responsive: true,
+        },
+        particles: {
+          density: 120,
+          color: '#243b6b',
+          size: {
+            value: 2,
+            random: true,
+          },
+        },
+        secondary_particles: {
+          enabled: true,
+          placement_mode: 'random',
+          particle_multiplier: 0.08,
+          random_margin: 70,
+          color: '#7aa5ff',
+          size: {
+            value: 1.1,
+            random: true,
+          },
+          movement: {
+            speed: 0.6,
+          },
+        },
+        interactions: {
+          repulse: {
+            distance: 120,
+            strength: 180,
+          },
+        },
+        image: {
+          src: {
+            path: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=cover&w=700&q=80',
+            is_external: true,
+          },
+          size: {
+            canvas_pct: 50,
+            min_px: 220,
+            max_px: 520,
+          },
+          position: {
+            x_img_pct: -10,
+            y_img_pct: -8,
+          },
+        },
+      }
+
+      const particleSystem = new ReliqParticleImage('#particle-container', config)
+      particleSystem.initialize()
+    </script>
+  </body>
+</html>

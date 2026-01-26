@@ -1,0 +1,52 @@
+{
+  "name": "reliq-enhanced-particle-image",
+  "version": "2.0.0",
+  "description": "Enhanced particle image system with advanced animations, secondary particles, and responsive scaling",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "files": [
+    "dist/",
+    "src/",
+    "examples/",
+    "config/",
+    "docs/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run build:dev && npm run build:min",
+    "build:dev": "webpack --mode=development --output-filename=particle-image-enhanced.js",
+    "build:min": "webpack --mode=production --optimize-minimize --output-filename=particle-image-enhanced.min.js",
+    "dev": "webpack serve --mode=development --open",
+    "test": "jest",
+    "docs": "jsdoc -c jsdoc.conf.json"
+  },
+  "keywords": [
+    "particle",
+    "animation",
+    "canvas",
+    "interactive",
+    "responsive",
+    "sprite-animation",
+    "javascript"
+  ],
+  "author": "Reliq Studios",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:reliqstudios/reliq-enhanced-particle-image.git"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "jest": "^29.5.0",
+    "jsdoc": "^4.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "peerDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

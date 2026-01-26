@@ -1,0 +1,61 @@
+{
+  "particles": {
+    "color": "#3c3836",
+    "density": 50,
+    "start_scrambled": false,
+    "movement": {
+      "speed": 10,
+      "restless": {
+        "enabled": true,
+        "value": 1000
+      }
+    },
+    "interactivity": {
+      "on_hover": {
+        "enabled": true,
+        "action": "repulse"
+      },
+      "on_click": {
+        "enabled": false,
+        "action": "big_repulse"
+      },
+      "on_touch": {
+        "enabled": true,
+        "action": "repulse"
+      }
+    }
+  },
+  "image": {
+    "src": {
+      "path": "/chest/test.png",
+      "is_external": false
+    },
+    "position": {
+      "x_img_pct": -15,
+      "y_img_pct": -15
+    },
+    "size": {
+      "canvas_pct": 50,
+      "min_px": 350,
+      "max_px": 2000
+    }
+  },
+  "interactions": {
+    "repulse": {
+      "detection_radius": 40,
+      "max_displacement": 0.5,
+      "repulse_duration": 0.1,
+      "force_curve": "linear"
+    }
+  },
+  "features": {
+    "responsive": true,
+    "secondaryParticles": false,
+    "animation": false,
+    "floating": true,
+    "scatter": true,
+    "fade": true,
+    "interactivity": true
+  },
+  "disabled": false
+}
