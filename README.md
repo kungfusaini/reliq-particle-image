@@ -1,11 +1,13 @@
 # Reliq Enhanced Particle Image
 
-[![NPM Version](https://img.shields.io/npm/v/reliq-enhanced-particle-image.svg)](https://www.npmjs.com/package/reliq-enhanced-particle-image)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Advanced particle image system with sprite animations, dual particle layers, responsive scaling, and modern ES6+ architecture.**
 
 An enhancement to the brilliant [particle-image](https://github.com/paxtonfitzpatrick/particle-image). Credit goes to Paxton Fitzpatrick for the amazing original library.
+
+See the [live examples](https://kungfusaini.github.io/reliq-particle-image/examples/index.html)
+
 
 ## 🚀 Key Enhancements
 
@@ -30,11 +32,6 @@ An enhancement to the brilliant [particle-image](https://github.com/paxtonfitzpa
 - **Conditional Rendering** - Only render active features
 
 ## 📦 Installation
-
-### NPM (Recommended)
-```bash
-npm install reliq-enhanced-particle-image
-```
 
 ### Browser Build (after local build)
 ```bash
@@ -428,11 +425,10 @@ const particleSystem = new ReliqParticleImage('#container', {
 await particleSystem.initialize();
 ```
 
-See [examples/README.md](examples/README.md) for a guided walkthrough.
 
 ## 🧪 Testing & Examples
 
-### Live Examples
+### Examples
 - [Interactive Repulse](examples/advanced-demo.html) - Hover and click interaction showcase
 - [Secondary Particles](examples/secondary-particles.html) - Depth layer configuration
 - [Animation Demo](examples/animation-demo.html) - Frame-based animation playback
