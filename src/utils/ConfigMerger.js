@@ -83,7 +83,7 @@ export class ConfigMerger {
     }
   }
 
-  /**
+/**
    * Set default configuration values
    * @param {Object} config - Configuration object
    * @returns {Object} Configuration with defaults applied
@@ -112,6 +112,10 @@ export class ConfigMerger {
         },
         scatter: {
           force: 3
+        },
+        fade_out: {
+          enabled: false,
+          duration: 2000
         },
         interactivity: {
           on_hover: {
@@ -151,9 +155,22 @@ export class ConfigMerger {
           force_curve: 'linear'
         },
         big_repulse: {
-          distance: 120,
-          strength: 300
+          distance: 100,
+          strength: 500
         }
+      },
+      flow: {
+        preset: 'float_click_animate_scatter_fade',
+        stages: [
+          { type: 'float', enabled: true },
+          { type: 'wait_for_click', enabled: true },
+          { type: 'animation', enabled: true, play_once: true },
+          { type: 'disable_floating', enabled: true },
+          { type: 'scatter', enabled: true },
+          { type: 'fade_out', enabled: true }
+        ],
+        current_stage_index: 0,
+        auto_progress: true
       },
       responsive: {
         enabled: false
@@ -174,6 +191,18 @@ export class ConfigMerger {
     if (!config.animation && config.image?.animation) {
       config.animation = { ...config.image.animation }
       delete config.image.animation
+    }
+
+    if (!config.responsive && config.particles?.responsive) {
+      config.responsive = { ...config.particles.responsive }
+    }
+
+    if (config.flow?.play_once && config.animation) {
+      config.animation.loop = false
+    }
+
+    if (config.flow?.click_to_play && config.animation?.auto_start === undefined) {
+      config.animation.auto_start = false
     }
 
     if (features.responsive !== false && config.responsive?.enabled === undefined) {

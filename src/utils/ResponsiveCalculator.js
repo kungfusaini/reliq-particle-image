@@ -14,31 +14,24 @@ export class ResponsiveCalculator {
    * @returns {number} Calculated responsive size
    */
   calculateResponsiveSize(baseSize) {
-    if (!this.config.responsive?.enabled) {
-      return baseSize
-    }
-    
     const viewport = Utils.getViewportSize()
-    const sizeConfig = this.config.responsive.size || this.config.particles?.size?.responsive
+    const sizeConfig = this.config.particles?.size
     
-    if (!sizeConfig) {
+    // Check if we have responsive properties in size config
+    if (!sizeConfig || 
+        (typeof sizeConfig.min_size === 'undefined' && 
+         typeof sizeConfig.max_size === 'undefined' &&
+         typeof sizeConfig.scale_factor === 'undefined')) {
       return baseSize
     }
     
-    // Calculate dynamic multiplier based on viewport width
+    // EXACT OLD CALCULATION: viewportRatio + (scale_factor * viewport.width)
     const viewportRatio = viewport.width / (sizeConfig.base_viewport || 600)
-    const dynamicMultiplier = Utils.clamp(
-      1.0 + (viewportRatio - 1.0) * (sizeConfig.scale_factor || 0.0005) * viewport.width,
-      0.3,
-      2.0
-    )
+    const dynamicMultiplier = Math.max(0.3, Math.min(2.0, viewportRatio + (sizeConfig.scale_factor || 0.0005) * viewport.width))
     
     const calculatedSize = baseSize * dynamicMultiplier
-    return Utils.clamp(
-      calculatedSize,
-      sizeConfig.min_size || 0.8,
-      sizeConfig.max_size || 4.0
-    )
+    // EXACT OLD CLAMP: uses sizeConfig.min_size and sizeConfig.max_size directly
+    return Math.min(Math.max(calculatedSize, sizeConfig.min_size || 0.8), sizeConfig.max_size || 4.0)
   }
 
   /**
@@ -47,27 +40,8 @@ export class ResponsiveCalculator {
    * @returns {number} Calculated responsive density
    */
   calculateResponsiveDensity(baseDensity) {
-    if (!this.config.responsive?.enabled) {
-      return baseDensity
-    }
-    
-    const viewport = Utils.getViewportSize()
-    const densityConfig = this.config.responsive.density || this.config.particles?.responsive?.density
-    
-    if (!densityConfig) {
-      return baseDensity
-    }
-    
-    // Calculate dynamic density based on viewport width
-    const viewportRatio = viewport.width / (densityConfig.base_viewport || 600)
-    const dynamicDensity = (densityConfig.min_density || 50) + 
-      (viewportRatio - 0.5) * (densityConfig.scale_factor || 0.08) * viewport.width
-    
-    return Utils.clamp(
-      dynamicDensity,
-      densityConfig.min_density || 50,
-      densityConfig.max_density || 200
-    )
+    // Always return base density - no responsive density calculation
+    return baseDensity
   }
 
   /**

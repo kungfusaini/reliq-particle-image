@@ -116,6 +116,19 @@
       "touch_max_offset": 2.0
     }
   },
+  "flow": {
+    "preset": "float_click_animate_scatter_fade",
+    "stages": [
+      { "type": "float", "enabled": true },
+      { "type": "wait_for_click", "enabled": true },
+      { "type": "animation", "enabled": true, "play_once": true },
+      { "type": "disable_floating", "enabled": true },
+      { "type": "scatter", "enabled": true },
+      { "type": "fade_out", "enabled": true }
+    ],
+    "current_stage_index": 0,
+    "auto_progress": true
+  },
   "features": {
     "responsive": true,
     "secondaryParticles": true,

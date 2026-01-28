@@ -28,15 +28,26 @@ export class ReliqParticleImage {
     this.isInitialized = false
     this.isDestroyed = false
 
-    // Feature toggles (opt-in)
+    const featureOverrides = config.features || {}
+
+    // Feature toggles (opt-in or inferred)
     this.features = {
-      responsive: config.features?.responsive !== false,
-      secondaryParticles: config.features?.secondaryParticles === true,
-      animation: config.features?.animation === true,
-      floating: config.features?.floating === true,
-      scatter: config.features?.scatter !== false,
-      fade: config.features?.fade === true,
-      interactivity: config.features?.interactivity !== false
+      responsive: featureOverrides.responsive ?? config.responsive?.enabled !== false,
+      secondaryParticles: featureOverrides.secondaryParticles ?? config.secondary_particles?.enabled === true,
+      animation: featureOverrides.animation ?? config.animation?.enabled === true,
+      floating: featureOverrides.floating ?? config.particles?.movement?.floating?.enabled === true,
+      scatter: featureOverrides.scatter ?? config.particles?.scatter?.force !== undefined,
+      fade: featureOverrides.fade ?? config.particles?.fade_out?.enabled === true,
+      interactivity: featureOverrides.interactivity ?? true
+    }
+
+    this.flow = this.config.flow || {}
+    this.flowState = {
+      animationTriggered: false,
+      floatingDisabled: false,
+      currentStageIndex: this.flow.current_stage_index || 0,
+      stages: this.flow.stages || [],
+      autoProgress: this.flow.auto_progress !== false
     }
 
     // Initialize systems based on features
@@ -109,6 +120,14 @@ export class ReliqParticleImage {
       this.interactionManager.attach()
     }
 
+    if (this.animationSystem && this.isCurrentStage('wait_for_click')) {
+      this.canvas.style.cursor = 'pointer'
+      this.canvas.addEventListener('click', this.handleFlowClick.bind(this))
+      this.canvas.addEventListener('touchstart', this.handleFlowClick.bind(this), {
+        passive: false,
+      })
+    }
+
     // Handle resize
     window.addEventListener('resize', Utils.debounce(() => {
       this.handleResize()
@@ -119,6 +138,186 @@ export class ReliqParticleImage {
       document.addEventListener('animationStopped', this.handleAnimationStopped.bind(this))
       document.addEventListener('animationFrameChanged', this.handleAnimationFrameChanged.bind(this))
     }
+  }
+
+  /**
+   * Check if given stage type is currently active
+   * @param {string} stageType - Type of stage to check
+   * @returns {boolean} True if stage is active
+   */
+  isCurrentStage(stageType) {
+    if (!this.flowState.stages || this.flowState.stages.length === 0) {
+      return false
+    }
+    
+    const currentStage = this.flowState.stages[this.flowState.currentStageIndex]
+    return currentStage && currentStage.type === stageType && currentStage.enabled !== false
+  }
+  
+  /**
+   * Progress to next stage in flow
+   */
+  progressToNextStage() {
+    if (!this.flowState.stages || this.flowState.stages.length === 0) {
+      return
+    }
+    
+    const currentIndex = this.flowState.currentStageIndex
+    if (currentIndex < this.flowState.stages.length - 1) {
+      this.flowState.currentStageIndex = currentIndex + 1
+      this.executeCurrentStage()
+      
+      // Dispatch stage change event
+      document.dispatchEvent(new CustomEvent('particleFlowStageChanged', {
+        detail: {
+          stage: this.flowState.stages[this.flowState.currentStageIndex],
+          index: this.flowState.currentStageIndex,
+          totalStages: this.flowState.stages.length,
+          timestamp: performance.now()
+        }
+      }))
+    }
+  }
+  
+  /**
+   * Execute current stage actions
+   */
+  executeCurrentStage() {
+    if (!this.flowState.stages || this.flowState.stages.length === 0) {
+      return
+    }
+    
+    const stage = this.flowState.stages[this.flowState.currentStageIndex]
+    if (!stage || stage.enabled === false) {
+      this.progressToNextStage()
+      return
+    }
+    
+    switch (stage.type) {
+      case 'float':
+        this.executeFloatStage()
+        break
+      case 'wait_for_click':
+        this.executeWaitForClickStage()
+        break
+      case 'animation':
+        this.executeAnimationStage(stage)
+        break
+      case 'disable_floating':
+        this.executeDisableFloating()
+        break
+      case 'scatter':
+        this.executeScatter()
+        break
+      case 'fade_out':
+        this.executeFadeOut()
+        break
+    }
+  }
+  
+  /**
+   * Execute float stage
+   */
+  executeFloatStage() {
+    if (this.floatingEffect) {
+      this.floatingEffect.updateConfig({
+        particles: {
+          movement: {
+            floating: { enabled: true }
+          }
+        }
+      });
+      this.flowState.floatingDisabled = false;
+    }
+  }
+  
+  /**
+   * Initialize flow system
+   */
+  initializeFlow() {
+    if (this.flowState.stages && this.flowState.stages.length > 0) {
+      this.executeCurrentStage();
+    }
+  }
+  
+  /**
+   * Execute wait for click stage
+   */
+  executeWaitForClickStage() {
+    // Already handled by event listeners in setupEventListeners
+    this.canvas.style.cursor = 'pointer';
+  }
+  
+  /**
+   * Execute animation stage
+   */
+  executeAnimationStage(stage) {
+    if (!this.animationSystem || !this.features.animation) {
+      this.progressToNextStage()
+      return
+    }
+    
+    const playOnce = stage.play_once !== false
+    
+    // Setup animation system based on stage config
+    if (playOnce) {
+      this.config.animation = { ...this.config.animation, loop: false }
+      this.animationSystem.updateConfig({ animation: { loop: false } })
+    }
+    
+    // Start animation immediately or wait for trigger?
+    if (stage.auto_start !== false) {
+      if (this.floatingEffect && !this.flowState.floatingDisabled) {
+        this.animationSystem.floatOffset = this.floatingEffect.calculateOffset()
+      }
+      this.animationSystem.start()
+    }
+  }
+
+  /**
+   * Handle click/touch to trigger animation or next stage
+   */
+  handleFlowClick(event) {
+    if (event?.type === 'touchstart') {
+      event.preventDefault()
+    }
+
+    if (this.isCurrentStage('wait_for_click')) {
+      this.progressToNextStage()
+    } else if (this.isCurrentStage('animation')) {
+      const stage = this.flowState.stages[this.flowState.currentStageIndex]
+      if (stage.auto_start === false) {
+        this.startAnimation()
+      }
+    }
+  }
+
+  /**
+   * Trigger animation playback based on flow settings
+   */
+  handleAnimationTrigger(event) {
+    if (event?.type === 'touchstart') {
+      event.preventDefault()
+    }
+
+    if (!this.animationSystem || !this.features.animation) {
+      return
+    }
+
+    if (this.animationSystem && this.animationSystem.isPlaying && typeof this.animationSystem.isPlaying === 'function' && this.animationSystem.isPlaying()) {
+      return
+    }
+
+    if (this.flow.play_once && this.flowState.animationTriggered) {
+      return
+    }
+
+    if (this.floatingEffect && !this.flowState.floatingDisabled) {
+      this.animationSystem.floatOffset = this.floatingEffect.calculateOffset()
+    }
+
+    this.flowState.animationTriggered = true
+    this.animationSystem.start()
   }
 
   /**
@@ -139,6 +338,12 @@ export class ReliqParticleImage {
       await this.loadImage()
       
       if (this.animationSystem) {
+        // Create particles from first animation frame
+        const firstFramePixels = await this.getFirstAnimationFrame()
+        if (firstFramePixels) {
+          this.primarySystem.createImageParticles(firstFramePixels, this.config.particles?.start_scrambled !== true)
+        }
+        
         // Start with animation if configured
         if (this.config.animation?.auto_start) {
           this.animationSystem.start()
@@ -149,15 +354,18 @@ export class ReliqParticleImage {
         this.primarySystem.createImageParticles(pixelData, this.config.particles?.start_scrambled !== true)
       }
 
-      this.isInitialized = true
+    this.isInitialized = true
 
-      if (typeof window !== 'undefined') {
-        window.particleImageDisplayerReady = true
-        window.particleImageInitialized = true
-      }
+    if (typeof window !== 'undefined') {
+      window.particleImageDisplayerReady = true
+      window.particleImageInitialized = true
+    }
 
-      // Start animation loop
-      this.startAnimationLoop()
+    // Initialize flow
+    this.initializeFlow()
+
+    // Start animation loop
+    this.startAnimationLoop()
 
       // Dispatch ready event
       document.dispatchEvent(new CustomEvent('particleImageReady', {
@@ -173,6 +381,25 @@ export class ReliqParticleImage {
       console.error('Failed to initialize particle system:', error)
       this.handleError(error)
     }
+  }
+
+  /**
+   * Get first animation frame for initial particle creation
+   */
+  async getFirstAnimationFrame() {
+    if (!this.animationSystem || !this.config.animation?.frames?.length) {
+      return null
+    }
+    
+    // Make sure animation system is initialized
+    await this.animationSystem.initialize()
+    
+    // Set current frame to first frame
+    const firstFrame = this.config.animation.frames[0]
+    this.animationSystem.setFrame(firstFrame)
+    
+    // Get pixel data for first frame
+    return this.animationSystem.getCurrentFramePixels()
   }
 
   /**
@@ -284,10 +511,16 @@ export class ReliqParticleImage {
    * Update all systems
    */
   updateSystems() {
-    const interactionState =
-      this.features.interactivity && this.interactionManager
-        ? this.interactionManager.getInteractionState()
-        : null
+    let animationPlaying = false
+    if (this.animationSystem && this.animationSystem.isPlaying && typeof this.animationSystem.isPlaying === 'function') {
+      animationPlaying = this.animationSystem.isPlaying()
+    }
+    const allowInteractivity =
+      this.features.interactivity &&
+      (!animationPlaying || this.flow.disable_interactivity_during_animation !== true)
+    const interactionState = allowInteractivity && this.interactionManager
+      ? this.interactionManager.getInteractionState()
+      : null
     const interactionManager = interactionState ? this.interactionManager : null
 
     // Update primary particles
@@ -317,9 +550,27 @@ export class ReliqParticleImage {
    */
   renderSystems() {
     const opacity = this.fadeEffect ? this.fadeEffect.getCurrentOpacity() : 1.0
+    let animationPlaying = false
+    if (this.animationSystem && this.animationSystem.isPlaying && typeof this.animationSystem.isPlaying === 'function') {
+      animationPlaying = this.animationSystem.isPlaying()
+    }
+    let floatOffset = { x: 0, y: 0 }
+
+    if (this.floatingEffect && !this.flowState.floatingDisabled) {
+      if (animationPlaying && this.animationSystem?.floatOffset) {
+        floatOffset = this.animationSystem.floatOffset
+      } else if (!animationPlaying) {
+        floatOffset = this.floatingEffect.calculateOffset()
+      }
+    }
 
     // Determine render order
     const renderSecondaryFirst = this.config.secondary_particles?.render_order === 'background'
+
+    if (floatOffset.x !== 0 || floatOffset.y !== 0) {
+      this.context.save()
+      this.context.translate(floatOffset.x, floatOffset.y)
+    }
 
     if (renderSecondaryFirst && this.secondarySystem) {
       this.secondarySystem.renderParticles(opacity)
@@ -329,6 +580,10 @@ export class ReliqParticleImage {
       if (this.secondarySystem) {
         this.secondarySystem.renderParticles(opacity)
       }
+    }
+
+    if (floatOffset.x !== 0 || floatOffset.y !== 0) {
+      this.context.restore()
     }
   }
 
@@ -354,13 +609,51 @@ export class ReliqParticleImage {
    * Handle animation stopped event
    */
   handleAnimationStopped(event) {
-    // Trigger scatter and fade effects
+    if (this.flowState.autoProgress) {
+      this.progressToNextStage()
+    }
+    
+    if (this.isCurrentStage('disable_floating')) {
+      this.executeDisableFloating()
+    }
+    
+    if (this.isCurrentStage('scatter')) {
+      this.executeScatter()
+    }
+    
+    if (this.isCurrentStage('fade_out')) {
+      this.executeFadeOut()
+    }
+  }
+  
+  /**
+   * Execute disable floating stage
+   */
+  executeDisableFloating() {
+    this.flowState.floatingDisabled = true
+    if (this.config.particles?.movement?.floating) {
+      this.config.particles.movement.floating.enabled = false
+    }
+    if (this.floatingEffect) {
+      this.floatingEffect.updateConfig(this.config)
+    }
+  }
+  
+  /**
+   * Execute scatter stage
+   */
+  executeScatter() {
     if (this.scatterEffect) {
       const primaryParticles = this.primarySystem.getParticles()
       const secondaryParticles = this.secondarySystem?.getParticles() || []
       this.scatterEffect.scatterParticles([...primaryParticles, ...secondaryParticles])
     }
-
+  }
+  
+  /**
+   * Execute fade out stage
+   */
+  executeFadeOut() {
     if (this.fadeEffect) {
       this.fadeEffect.startFadeOut()
     }
@@ -381,8 +674,11 @@ export class ReliqParticleImage {
    * Handle fade complete event
    */
   handleFadeComplete() {
-    // Clear primary particles but keep secondary
+    // Clear all particles after fade
     this.primarySystem.clearParticles()
+    if (this.secondarySystem) {
+      this.secondarySystem.clearParticles()
+    }
     
     // Dispatch completion event
     document.dispatchEvent(new CustomEvent('particleAnimationComplete', {
@@ -495,7 +791,10 @@ export class ReliqParticleImage {
    * Check if animation is currently playing
    */
   isAnimationPlaying() {
-    return this.animationSystem ? this.animationSystem.isPlaying() : false
+    if (this.animationSystem && this.animationSystem.isPlaying && typeof this.animationSystem.isPlaying === 'function') {
+      return this.animationSystem.isPlaying()
+    }
+    return false
   }
 
   /**
@@ -540,7 +839,7 @@ export class ReliqParticleImage {
       primaryParticles: this.primarySystem.getParticleCount(),
       secondaryParticles: this.secondarySystem?.getParticleCount() || 0,
       totalParticles: this.primarySystem.getParticleCount() + (this.secondarySystem?.getParticleCount() || 0),
-      animationPlaying: this.animationSystem?.isPlaying() || false,
+      animationPlaying: (this.animationSystem && this.animationSystem.isPlaying && typeof this.animationSystem.isPlaying === 'function') ? this.animationSystem.isPlaying() : false,
       currentFrame: this.animationSystem?.getCurrentFrame() || null,
       features: this.features
     }

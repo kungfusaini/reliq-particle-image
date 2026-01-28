@@ -10,7 +10,7 @@ export class AnimationSystem {
     this.canvas = canvas
     this.context = canvas.getContext('2d', { willReadFrequently: true })
     this.frameCache = new FrameCache()
-    this.isPlaying = false
+    this._isPlaying = false
     this.currentFrame = null
     this.hasPlayedOnce = false
     this.lastFrameTime = 0
@@ -156,7 +156,7 @@ export class AnimationSystem {
    * Start animation playback
    */
   start() {
-    if (!this.config.animation?.enabled || this.isPlaying) {
+    if (!this.config.animation?.enabled || this._isPlaying) {
       return
     }
     
@@ -170,7 +170,7 @@ export class AnimationSystem {
     
     // Reset to first frame
     this.currentFrame = this.animationFrames[0]
-    this.isPlaying = true
+    this._isPlaying = true
     this.lastFrameTime = performance.now()
     this.hasPlayedOnce = true
     
@@ -181,7 +181,7 @@ export class AnimationSystem {
    * Stop animation and trigger cleanup effects
    */
   stop() {
-    this.isPlaying = false
+    this._isPlaying = false
     this.floatOffset = null
     
     // Dispatch event for other systems to handle cleanup
@@ -221,7 +221,7 @@ export class AnimationSystem {
    * Animation loop
    */
   animate() {
-    if (!this.isPlaying) {
+    if (!this._isPlaying) {
       return
     }
     
@@ -270,7 +270,7 @@ export class AnimationSystem {
    * Check if animation is currently playing
    */
   isPlaying() {
-    return this.isPlaying
+    return this._isPlaying
   }
 
   /**
@@ -303,7 +303,7 @@ export class AnimationSystem {
    * Reset animation state
    */
   reset() {
-    this.isPlaying = false
+    this._isPlaying = false
     this.currentFrame = null
     this.hasPlayedOnce = false
     this.lastFrameTime = 0
